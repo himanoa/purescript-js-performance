@@ -1,0 +1,13 @@
+package:
+  name: js-performance
+  dependencies:
+    - console
+    - effect
+    - prelude
+  test:
+    main: Test.Main
+    dependencies: []
+workspace:
+  packageSet:
+    registry: 62.1.0
+  extraPackages: {}
