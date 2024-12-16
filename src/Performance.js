@@ -30,10 +30,15 @@ export const _mark= (mark) => (options) => () => {
   return performance.mark(mark, options)
 }
 
-export const _measure= (mark) => (optionsOrStartMark) => (endMark) => () => {
-  return performance.measure(mark, optionsOrStartMark, endMark)
+export const _measure= (mark) => (startMark) => (endMark) => () => {
+  return performance.measure(mark, startMark, endMark)
 }
 
 export const _setResourceTimingBufferSize = (maxSize) => () => {
   return performance.setResouceTimingBufferSize(maxsize)
 }
+
+export const _clearMeasures = (name) => () =>  {
+  return performance.clearMeasures(name);
+};
+

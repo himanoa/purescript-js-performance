@@ -3,10 +3,20 @@ package:
   dependencies:
     - console
     - effect
+    - foreign
+    - foreign-object
+    - nullable
     - prelude
   test:
     main: Test.Main
-    dependencies: []
+    dependencies:
+      - aff
+      - effect
+      - quickcheck
+      - quickcheck-laws
+      - refs
+      - spec
+      - spec-quickcheck
 workspace:
   packageSet:
     registry: 62.1.0
