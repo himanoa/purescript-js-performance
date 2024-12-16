@@ -37,8 +37,3 @@ export const _measure= (mark) => (startMark) => (endMark) => () => {
 export const _setResourceTimingBufferSize = (maxSize) => () => {
   return performance.setResouceTimingBufferSize(maxsize)
 }
-
-export const _clearMeasures = (name) => () =>  {
-  return performance.clearMeasures(name);
-};
-

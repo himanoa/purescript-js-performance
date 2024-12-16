@@ -7,11 +7,13 @@ package:
     - foreign-object
     - nullable
     - prelude
+    - spec-node
   test:
     main: Test.Main
     dependencies:
       - aff
       - effect
+      - foldable-traversable
       - quickcheck
       - quickcheck-laws
       - refs

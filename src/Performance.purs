@@ -2,22 +2,16 @@ module Js.Performance where
 
 import Prelude
 
+import Data.Generic.Rep (class Generic)
 import Data.Maybe (Maybe(..))
+import Data.Show.Generic (genericShow)
 import Effect (Effect)
 import Foreign.Object as Foreign
-
--- | Performance Entry Types
-data PerformanceEntryType
-  = Mark
-  | Measure
-  | Resource
-  | Navigation
-  | Paint
 
 -- | Performance Entry Record
 type PerformanceEntry =
   { name :: String
-  , entryType :: PerformanceEntryType
+  , entryType :: String
   , startTime :: Number
   , duration :: Number
   }
@@ -25,7 +19,7 @@ type PerformanceEntry =
 -- | Resource Timing Entry
 type PerformanceResourceTiming =
   { name :: String
-  , entryType :: PerformanceEntryType
+  , entryType :: String
   , startTime :: Number
   , duration :: Number
   , initiatorType :: String
@@ -67,7 +61,7 @@ foreign import _clearMeasures :: String -> Effect Unit
 foreign import _clearResourceTimings :: Effect Unit
 foreign import _getEntries :: Effect (Array PerformanceEntry)
 foreign import _getEntriesByName :: String -> Effect (Array PerformanceEntry)
-foreign import _getEntriesByType :: PerformanceEntryType -> Effect (Array PerformanceEntry)
+foreign import _getEntriesByType :: String -> Effect (Array PerformanceEntry)
 foreign import _mark :: String -> MarkOptions -> Effect PerformanceEntry
 foreign import _measure :: String -> MeasureOptions -> Effect PerformanceEntry
 foreign import _setResourceTimingBufferSize :: Int -> Effect Unit
@@ -95,7 +89,7 @@ getEntriesByName :: String -> Effect (Array PerformanceEntry)
 getEntriesByName = _getEntriesByName
 
 -- | Get performance entries by type
-getEntriesByType :: PerformanceEntryType -> Effect (Array PerformanceEntry)
+getEntriesByType :: String -> Effect (Array PerformanceEntry)
 getEntriesByType = _getEntriesByType
 
 -- | Create a performance mark
@@ -105,7 +99,7 @@ mark name opts = _mark name (case opts of
     { detail: d
     , startTime: st 
     }
-  Nothing -> {detail: Nothing, startTime: Nothing})
+  Nothing -> {})
 
 -- | Create a performance measure
 measure :: String -> Maybe MeasureOptions -> Effect PerformanceEntry
@@ -127,3 +121,4 @@ clearMeasures :: Maybe String -> Effect Unit
 clearMeasures = case _ of 
   Just name -> _clearMeasures name
   Nothing -> _clearMeasures ""
+
