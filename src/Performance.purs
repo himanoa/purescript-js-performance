@@ -1,12 +1,51 @@
-module Js.Performance where
+module Js.Performance 
+  ( PerformanceEntry
+  , PerformanceResourceTiming
+  , EntryType(..)
+  , now
+  , mark
+  , mark'
+  , mark''
+  , mark'''
+  , measure
+  , measure'
+  , measure''
+  , measure'''
+  , measure''''
+  , measure'''''
+  , clearMarks
+  , clearMark
+  , clearMeasures
+  , clearMeasure
+  , clearResourceTimings
+  , getEntries
+  , getEntriesByName
+  , getEntriesByType
+  , setResourceTimingBufferSize
+  ) where
 
 import Prelude
 
 import Data.Generic.Rep (class Generic)
-import Data.Maybe (Maybe(..))
 import Data.Show.Generic (genericShow)
 import Effect (Effect)
-import Foreign.Object as Foreign
+import Foreign.Object (Object)
+
+-- | Performance Entry types
+data EntryType = Mark | Measure | Resource | Navigation | Paint
+
+derive instance Generic EntryType _
+derive instance Eq EntryType
+instance Show EntryType where
+  show = genericShow
+
+entryTypeToString :: EntryType -> String
+entryTypeToString = case _ of
+  Mark -> "mark"
+  Measure -> "measure"
+  Resource -> "resource"
+  Navigation -> "navigation"
+  Paint -> "paint"
 
 -- | Performance Entry Record
 type PerformanceEntry =
@@ -41,84 +80,81 @@ type PerformanceResourceTiming =
   , decodedBodySize :: Number
   }
 
--- | Performance Mark Options
-type MarkOptions =
-  { detail :: Maybe (Foreign.Object String)
-  , startTime :: Maybe Number
-  }
-
--- | Performance Measure Options
-type MeasureOptions =
-  { detail :: Maybe (Foreign.Object String)
-  , start :: Maybe String
-  , duration :: Maybe Number
-  , end :: Maybe String
-  }
-
+-- FFI
 foreign import _now :: Effect Number
 foreign import _clearMarks :: String -> Effect Unit
+foreign import __clearMarks :: Effect Unit
 foreign import _clearMeasures :: String -> Effect Unit
+foreign import __clearMeasures :: Effect Unit
 foreign import _clearResourceTimings :: Effect Unit
 foreign import _getEntries :: Effect (Array PerformanceEntry)
 foreign import _getEntriesByName :: String -> Effect (Array PerformanceEntry)
 foreign import _getEntriesByType :: String -> Effect (Array PerformanceEntry)
-foreign import _mark :: String -> MarkOptions -> Effect PerformanceEntry
-foreign import _measure :: String -> MeasureOptions -> Effect PerformanceEntry
+foreign import _mark :: forall r. String -> { | r } -> Effect PerformanceEntry
+foreign import _measure :: forall r. String -> { | r } -> Effect PerformanceEntry
 foreign import _setResourceTimingBufferSize :: Int -> Effect Unit
 
--- | Get current high resolution timestamp
 now :: Effect Number
 now = _now
 
--- | Clear performance marks
-clearMarks :: Maybe String -> Effect Unit
-clearMarks = case _ of
-  Just name -> _clearMarks name
-  Nothing -> _clearMarks ""
+mark :: String -> Effect PerformanceEntry
+mark name = _mark name {}
 
--- | Clear resource timing buffer
+mark' :: String -> { startTime :: Number } -> Effect PerformanceEntry
+mark' name opts = _mark name opts
+
+mark'' :: String -> { detail :: Object String } -> Effect PerformanceEntry
+mark'' name opts = _mark name opts
+
+mark''' :: String -> { detail :: Object String, startTime :: Number } -> Effect PerformanceEntry
+mark''' name = _mark name
+
+measure :: String -> Effect PerformanceEntry
+measure name = _measure name {}
+
+measure' :: String -> { start :: String, end :: String } -> Effect PerformanceEntry
+measure' name opts = _measure name opts
+
+measure'' :: String -> { start :: String, duration :: Number } -> Effect PerformanceEntry
+measure'' name opts = _measure name opts
+
+measure''' :: String -> { duration :: Number, end :: String } -> Effect PerformanceEntry
+measure''' name opts = _measure name opts
+
+measure'''' :: String -> { detail :: Object String, start :: String, end :: String } -> Effect PerformanceEntry
+measure'''' name opts = _measure name opts
+
+measure''''' :: String -> 
+  { detail :: Object String
+  , start :: String
+  , duration :: Number
+  , end :: String 
+  } -> Effect PerformanceEntry
+measure''''' name opts = _measure name opts
+
+clearMarks :: Effect Unit
+clearMarks = __clearMarks
+
+clearMark :: String -> Effect Unit
+clearMark = _clearMarks
+
+clearMeasures :: Effect Unit
+clearMeasures = __clearMeasures
+
+clearMeasure :: String -> Effect Unit
+clearMeasure = _clearMeasures
+
 clearResourceTimings :: Effect Unit
 clearResourceTimings = _clearResourceTimings
 
--- | Get all performance entries
 getEntries :: Effect (Array PerformanceEntry)
 getEntries = _getEntries
 
--- | Get performance entries by name
 getEntriesByName :: String -> Effect (Array PerformanceEntry)
 getEntriesByName = _getEntriesByName
 
--- | Get performance entries by type
-getEntriesByType :: String -> Effect (Array PerformanceEntry)
-getEntriesByType = _getEntriesByType
+getEntriesByType :: EntryType -> Effect (Array PerformanceEntry)
+getEntriesByType = _getEntriesByType <<< entryTypeToString
 
--- | Create a performance mark
-mark :: String -> Maybe MarkOptions -> Effect PerformanceEntry
-mark name opts = _mark name (case opts of
-  Just { detail: d, startTime: st } -> 
-    { detail: d
-    , startTime: st 
-    }
-  Nothing -> {})
-
--- | Create a performance measure
-measure :: String -> Maybe MeasureOptions -> Effect PerformanceEntry
-measure name opts = _measure name (case opts of
-  Just { detail: d, start: s, duration: dur, end: e } -> 
-    { detail: d
-    , start: s
-    , duration: dur
-    , end: e
-    }
-  Nothing -> {detail: Nothing, start: Nothing, duration: Nothing, end: Nothing})
-
--- | Set resource timing buffer size
 setResourceTimingBufferSize :: Int -> Effect Unit
 setResourceTimingBufferSize = _setResourceTimingBufferSize
-
--- | Clear performance measures
-clearMeasures :: Maybe String -> Effect Unit
-clearMeasures = case _ of 
-  Just name -> _clearMeasures name
-  Nothing -> _clearMeasures ""
-

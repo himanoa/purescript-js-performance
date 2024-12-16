@@ -1,39 +1,35 @@
-export const _now = () => {
-  return performance.now()
-}
+export const _now = () => performance.now();
 
 export const _clearMarks = (name) => () => {
-  return performance.clearMarks(name)
-}
+  performance.clearMarks(name);
+};
+
+export const __clearMarks = () => {
+  performance.clearMarks();
+};
 
 export const _clearMeasures = (name) => () => {
-  return performance.clearMeasures(name)
-}
+  performance.clearMeasures(name);
+};
 
-export const _clearResourceTimings = () => {
-  return performance.clearResourceTimings()
-}
+export const __clearMeasures = () => {
+  performance.clearMeasures();
+};
 
-export const _getEntries = () => {
-  return performance.getEntries()
-}
+export const _clearResourceTimings = () => () => {
+  performance.clearResourceTimings();
+};
 
-export const _getEntriesByName = (name) => () => {
-  return performance.getEntriesByName(name)
-}
+export const _getEntries = () => performance.getEntries();
 
-export const _getEntriesByType= (type) => () => {
-  return performance.getEntriesByType(type)
-}
+export const _getEntriesByName = (name) => () => performance.getEntriesByName(name);
 
-export const _mark= (mark) => (options) => () => {
-  return performance.mark(mark, options)
-}
+export const _getEntriesByType = (type) => () => performance.getEntriesByType(type);
 
-export const _measure= (mark) => (startMark) => (endMark) => () => {
-  return performance.measure(mark, startMark, endMark)
-}
+export const _mark = (name) => (options) => () => performance.mark(name, options);
 
-export const _setResourceTimingBufferSize = (maxSize) => () => {
-  return performance.setResouceTimingBufferSize(maxsize)
-}
+export const _measure = (name) => (options) => () => performance.measure(name, options);
+
+export const _setResourceTimingBufferSize = (size) => () => {
+  performance.setResourceTimingBufferSize(size);
+};
