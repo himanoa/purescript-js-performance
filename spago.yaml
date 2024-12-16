@@ -5,9 +5,7 @@ package:
     - effect
     - foreign
     - foreign-object
-    - nullable
     - prelude
-    - spec-node
   test:
     main: Test.Main
     dependencies:
@@ -19,6 +17,7 @@ package:
       - refs
       - spec
       - spec-quickcheck
+      - spec-node
 workspace:
   packageSet:
     registry: 62.1.0
